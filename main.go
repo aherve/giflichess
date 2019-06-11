@@ -19,7 +19,7 @@ import (
 func main() {
 	args := os.Args
 	if len(args) != 2 {
-		log.Fatal("Please provide a lichess game url as parameter (example: https://lichess.org/some-id )")
+		log.Fatal("Please provide a lichess game url as parameter (example: https://lichess.org/bR4b8jno )")
 	}
 	game, gameID, err := lichess.GetGame(os.Args[1]) // 5 moves game
 	//game, gameID, err := lichess.GetGame("https://lichess.org/bR4b8jno") // 5 moves game
@@ -55,12 +55,14 @@ func main() {
 		} else {
 			outGIF.Delay = append(outGIF.Delay, 450)
 		}
+
 	}
 
-	f, err := os.OpenFile("out.gif", os.O_WRONLY|os.O_CREATE, 0600)
+	f, err := os.OpenFile(outputFile(gameID), os.O_WRONLY|os.O_CREATE, 755)
 	handle(err)
 	defer f.Close()
 	gif.EncodeAll(f, outGIF)
+	log.Println("gif successfully outputed to ", outputFile(gameID))
 }
 
 func handle(err error) {
@@ -99,6 +101,10 @@ func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {
 
 	// remove temp svg file
 	os.Remove(filebase + ".svg")
+}
+
+func outputFile(gameID string) string {
+	return "out/" + gameID + ".gif"
 }
 
 func fileBaseFor(gameID string, i int) string {
