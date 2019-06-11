@@ -2,11 +2,13 @@ package main
 
 import (
 	"./lichess"
+	"fmt"
 	"github.com/notnil/chess"
 	"github.com/notnil/chessimg"
 	"log"
 	"os"
-	"strconv"
+	"os/exec"
+	"sync"
 )
 
 func main() {
@@ -15,23 +17,36 @@ func main() {
 		log.Fatal(err)
 	}
 
+	var wg sync.WaitGroup
 	for i, pos := range game.Positions() {
-		drawPosition(pos, "pos_"+strconv.Itoa(i)+".svg")
+		wg.Add(1)
+		go drawPNG(pos, "pos_"+fmt.Sprintf("%03d", i), &wg)
 	}
+
+	wg.Wait()
 
 	log.Println(game.Position().Board().Draw())
 }
 
-func drawPosition(pos *chess.Position, filename string) {
+func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {
+	defer wg.Done()
+
 	// create file
-	f, err := os.Create(filename)
+	f, err := os.Create(filebase + ".svg")
 	if err != nil {
 		log.Fatal(err)
 	}
-	defer f.Close()
 
 	// write board SVG to file
 	if err := chessimg.SVG(f, pos.Board()); err != nil {
 		log.Fatal(err)
 	}
+
+	f.Close()
+
+	if r := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg").Run(); r != nil {
+		log.Fatal(err)
+	}
+
+	os.Remove(filebase + ".svg")
 }
