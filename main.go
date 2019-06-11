@@ -58,7 +58,7 @@ func main() {
 
 	}
 
-	f, err := os.OpenFile(outputFile(gameID), os.O_WRONLY|os.O_CREATE, 755)
+	f, err := os.OpenFile(outputFile(gameID), os.O_WRONLY|os.O_CREATE, 0755)
 	handle(err)
 	defer f.Close()
 	gif.EncodeAll(f, outGIF)
