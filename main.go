@@ -50,10 +50,12 @@ func main() {
 
 		// Add new frame to animated GIF
 		outGIF.Image = append(outGIF.Image, palettedImage)
-		if i < len(game.Positions())-1 {
-			outGIF.Delay = append(outGIF.Delay, 150)
-		} else {
+		if i == len(game.Positions())-1 {
 			outGIF.Delay = append(outGIF.Delay, 450)
+		} else if i < 10 {
+			outGIF.Delay = append(outGIF.Delay, 50)
+		} else {
+			outGIF.Delay = append(outGIF.Delay, 120)
 		}
 
 	}
