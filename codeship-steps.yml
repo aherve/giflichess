@@ -3,4 +3,4 @@
   command: go build
 - name: gotest
   service: go
-  command: go test
+  command: go test ./...
