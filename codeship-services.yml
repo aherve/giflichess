@@ -1,4 +1,8 @@
-go:
+gobuild:
+  build:
+    path: .
+    dockerfile_path: 'Dockerfile'
+gotest:
   build:
     path: .
     dockerfile_path: 'Dockerfile.test'

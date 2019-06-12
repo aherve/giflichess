@@ -1,6 +1,7 @@
-- name: gotest
-  service: go
-  command: go build
-- name: gotest
-  service: go
-  command: go test ./...
+- type: parallel
+  steps:
+  - service: gobuild
+    command: help
+
+  - service: gotest
+    command: go test ./...
