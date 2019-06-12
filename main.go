@@ -22,8 +22,6 @@ func main() {
 		log.Fatal("Please provide a lichess game url as parameter (example: https://lichess.org/bR4b8jno )")
 	}
 	game, gameID, err := lichess.GetGame(os.Args[1]) // 5 moves game
-	//game, gameID, err := lichess.GetGame("https://lichess.org/bR4b8jno") // 5 moves game
-	//game, gameID, err := lichess.GetGame("https://lichess.org/oyJ7H81yImOI") // 98 moves game
 	handle(err)
 
 	// Generate PNGs
@@ -97,12 +95,13 @@ func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {
 	f.Close()
 
 	// Use inkscape to convert svg -> png
-	if r := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg").Run(); r != nil {
-		log.Fatal(err)
-	}
-
-	// remove temp svg file
-	os.Remove(filebase + ".svg")
+	wg.Add(1)
+	go func(wg *sync.WaitGroup) {
+		if r := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg").Run(); r != nil {
+			log.Fatal(err)
+		}
+		wg.Done()
+	}(wg)
 }
 
 func outputFile(gameID string) string {
@@ -110,5 +109,5 @@ func outputFile(gameID string) string {
 }
 
 func fileBaseFor(gameID string, i int) string {
-	return gameID + fmt.Sprintf("%03d", i)
+	return "/tmp/" + gameID + fmt.Sprintf("%03d", i)
 }
