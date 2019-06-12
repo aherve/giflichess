@@ -9,13 +9,15 @@ import (
 	"image/draw"
 	"image/gif"
 	"image/png"
+	"io"
 	"log"
 	"os"
 	"os/exec"
 	"sync"
 )
 
-func GenerateGIF(game *chess.Game, gameID string, outputFile string) {
+// chessGame => output gif written in `outputFile`
+func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
 
 	// Generate PNGs
 	var wg sync.WaitGroup
@@ -51,10 +53,7 @@ func GenerateGIF(game *chess.Game, gameID string, outputFile string) {
 
 	}
 
-	f, err := os.OpenFile(outputFile, os.O_WRONLY|os.O_CREATE, 0755)
-	handle(err)
-	defer f.Close()
-	gif.EncodeAll(f, outGIF)
+	gif.EncodeAll(out, outGIF)
 }
 
 func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {

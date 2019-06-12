@@ -13,9 +13,14 @@ func main() {
 		log.Fatal("Please provide a lichess game url as parameter (example: https://lichess.org/bR4b8jno )")
 	}
 	game, gameID, err := lichess.GetGame(os.Args[1])
-	outputFile := "out/" + gameID + ".gif"
 	handle(err)
-	gifmaker.GenerateGIF(game, gameID, outputFile)
+
+	outputFile := "out/" + gameID + ".gif"
+	f, err := os.OpenFile(outputFile, os.O_WRONLY|os.O_CREATE, 0755)
+	handle(err)
+	defer f.Close()
+
+	gifmaker.GenerateGIF(game, gameID, f)
 	log.Println("gif successfully outputed to ", outputFile)
 }
 
