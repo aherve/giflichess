@@ -16,7 +16,8 @@ import (
 	"sync"
 )
 
-// chessGame => output gif written in `outputFile`
+// GenerateGIF will use *chess.Game to write a gif into an io.Writer
+// This uses inkscape as a dependency
 func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
 
 	// Generate PNGs
