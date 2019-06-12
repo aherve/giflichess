@@ -1,5 +1,0 @@
-FROM golang:stretch
-
-ADD . .
-
-RUN go get -u github.com/notnil/chessimg github.com/notnil/chess

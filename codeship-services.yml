@@ -1,4 +1,0 @@
-go:
-  build:
-    path: .
-    dockerfile_path: 'Dockerfile.test'
