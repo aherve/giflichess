@@ -1,17 +1,22 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"github.com/aherve/giflichess/gifmaker"
 	"github.com/aherve/giflichess/lichess"
 	"github.com/urfave/cli"
 	"log"
+	"net/http"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func main() {
 	var output string
 	var input string
+	var port int
 	app := cli.NewApp()
 	app.Name = "giflichess"
 	app.Usage = "generate fancy gifs from your lichess games"
@@ -48,14 +53,15 @@ func main() {
 			Aliases: []string{"s"},
 			Usage:   "run as a server",
 			Action: func(c *cli.Context) error {
-				fmt.Println("server")
+				serve(port)
 				return nil
 			},
 			Flags: []cli.Flag{
 				cli.IntFlag{
-					Name:  "port, p",
-					Value: 8080,
-					Usage: "server port",
+					Name:        "port, p",
+					Value:       8080,
+					Usage:       "server port",
+					Destination: &port,
 				},
 			},
 		},
@@ -65,6 +71,32 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func serve(port int) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		defer log.Println(r.Method, r.URL)
+
+		maybeID, err := getIDFromQuery(r)
+		if err != nil {
+			log.Fatal("ERR", err)
+			http.Error(w, err.Error(), 400)
+			return
+		}
+		game, gameID, err := lichess.GetGame(maybeID)
+		if err != nil {
+			log.Fatal("ERR", err)
+			http.Error(w, err.Error(), 500)
+			return
+		}
+		log.Println("got game", gameID)
+
+		w.Header().Set("Content-Disposition", "attachment")
+		w.Header().Set("filename", gameID+".gif")
+		gifmaker.GenerateGIF(game, gameID, w)
+	})
+	log.Println("starting server on port", port)
+	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
 
 func GenerateFile(urlOrID string, outFile string) error {
@@ -82,4 +114,12 @@ func GenerateFile(urlOrID string, outFile string) error {
 	gifmaker.GenerateGIF(game, gameID, f)
 	fmt.Printf("gif successfully outputed to %s\n", outFile)
 	return nil
+}
+
+func getIDFromQuery(r *http.Request) (string, error) {
+	split := strings.Split(r.URL.Path, "/")
+	if len(split) < 2 {
+		return "", errors.New("could not find no id")
+	}
+	return split[1], nil
 }
