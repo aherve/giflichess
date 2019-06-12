@@ -1,9 +1,9 @@
 package main
 
 import (
-	"./gifmaker"
-	"./lichess"
 	"fmt"
+	"github.com/aherve/giflichess/gifmaker"
+	"github.com/aherve/giflichess/lichess"
 	"github.com/urfave/cli"
 	"log"
 	"os"
