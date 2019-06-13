@@ -75,8 +75,10 @@ func main() {
 }
 
 func serve(port int) {
+	fs := http.FileServer(http.Dir("frontend/dist/giflichess"))
 	http.HandleFunc("/ping", ping)
-	http.HandleFunc("/", gifHandler)
+	http.HandleFunc("/lichess/", lichessGifHandler)
+	http.Handle("/", fs)
 	log.Println("starting server on port", port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
@@ -91,7 +93,7 @@ func ping(w http.ResponseWriter, r *http.Request) {
 	defer log()
 }
 
-func gifHandler(w http.ResponseWriter, r *http.Request) {
+func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	var status int
 	log := func() {
@@ -146,8 +148,8 @@ func generateFile(urlOrID string, outFile string) error {
 
 func getIDFromQuery(r *http.Request) (string, error) {
 	split := strings.Split(r.URL.Path, "/")
-	if len(split) < 2 || len(split[1]) < 8 {
+	if len(split) < 3 || len(split[2]) < 8 {
 		return "", errors.New("No id provided. Please visit /some-id. Example: /bR4b8jno")
 	}
-	return split[1], nil
+	return split[2], nil
 }
