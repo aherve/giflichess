@@ -32,7 +32,7 @@ func main() {
 				if len(input) == 0 {
 					return fmt.Errorf("Please pass an input game: example --game https://lichess.org/bR4b8jno")
 				}
-				return GenerateFile(input, output)
+				return generateFile(input, output)
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -116,7 +116,7 @@ func gifHandler(w http.ResponseWriter, r *http.Request) {
 	status = 200
 }
 
-func GenerateFile(urlOrID string, outFile string) error {
+func generateFile(urlOrID string, outFile string) error {
 	fmt.Printf("generating file %s from game %s...\n", outFile, urlOrID)
 	game, gameID, err := lichess.GetGame(urlOrID)
 	if err != nil {
