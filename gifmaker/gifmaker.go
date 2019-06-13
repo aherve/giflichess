@@ -16,6 +16,11 @@ import (
 	"sync"
 )
 
+type imgOutput struct {
+	index int
+	img   *image.Paletted
+}
+
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
 // This uses inkscape as a dependency
 func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
@@ -29,21 +34,39 @@ func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
 	}
 	wg.Wait()
 
-	// Generate GIF
-	outGIF := &gif.GIF{}
+	// Generate atomic GIFs
+	images := make([]*image.Paletted, len(game.Positions()), len(game.Positions()))
+	imgChan := make(chan imgOutput)
+	quit := make(chan bool)
 	for i, _ := range game.Positions() {
-		f, err := os.Open(fileBaseFor(gameID, i) + ".png")
-		handle(err)
-		defer f.Close()
-		inPNG, err := png.Decode(f)
-		handle(err)
+		wg.Add(1)
+		go func(gameID string, i int, outChan chan imgOutput) {
+			defer wg.Done()
+			outChan <- imgOutput{i, encodeGIFImage(gameID, i)}
+		}(gameID, i, imgChan)
 
-		bounds := inPNG.Bounds()
-		palettedImage := image.NewPaletted(bounds, palette.Plan9)
-		draw.Draw(palettedImage, palettedImage.Rect, inPNG, bounds.Min, draw.Over)
+	}
+	go func() {
+		wg.Wait()
+		quit <- true
+	}()
+
+loop:
+	for {
+		select {
+		case res := <-imgChan:
+			images[res.index] = res.img
+		case <-quit:
+			break loop
+		}
+	}
+
+	// Generate final GIF
+	outGIF := &gif.GIF{}
+	for i, img := range images {
 
 		// Add new frame to animated GIF
-		outGIF.Image = append(outGIF.Image, palettedImage)
+		outGIF.Image = append(outGIF.Image, img)
 		if i == len(game.Positions())-1 {
 			outGIF.Delay = append(outGIF.Delay, 450)
 		} else if i < 10 {
@@ -51,10 +74,24 @@ func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
 		} else {
 			outGIF.Delay = append(outGIF.Delay, 120)
 		}
-
 	}
 
 	gif.EncodeAll(out, outGIF)
+}
+
+// encodeGIFImage reads a png from gameID & index, and returns a palettedImage
+func encodeGIFImage(gameID string, i int) *image.Paletted {
+	f, err := os.Open(fileBaseFor(gameID, i) + ".png")
+	handle(err)
+	defer f.Close()
+	inPNG, err := png.Decode(f)
+	handle(err)
+
+	bounds := inPNG.Bounds()
+	palettedImage := image.NewPaletted(bounds, palette.Plan9)
+	draw.Draw(palettedImage, palettedImage.Rect, inPNG, bounds.Min, draw.Over)
+
+	return palettedImage
 }
 
 func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {
