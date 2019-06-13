@@ -11,6 +11,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func main() {
@@ -74,29 +75,45 @@ func main() {
 }
 
 func serve(port int) {
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		defer log.Println(r.Method, r.URL)
-
-		maybeID, err := getIDFromQuery(r)
-		if err != nil {
-			log.Fatal("ERR", err)
-			http.Error(w, err.Error(), 400)
-			return
-		}
-		game, gameID, err := lichess.GetGame(maybeID)
-		if err != nil {
-			log.Fatal("ERR", err)
-			http.Error(w, err.Error(), 500)
-			return
-		}
-		log.Println("got game", gameID)
-
-		w.Header().Set("Content-Disposition", "attachment")
-		w.Header().Set("filename", gameID+".gif")
-		gifmaker.GenerateGIF(game, gameID, w)
-	})
+	http.HandleFunc("/", gifHandler)
 	log.Println("starting server on port", port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
+}
+
+func gifHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	var status int
+	log := func() {
+		log.Println(r.Method, r.URL, status, time.Since(start))
+	}
+	defer log()
+
+	// get ID
+	maybeID, err := getIDFromQuery(r)
+	if err != nil {
+		status = 400
+		http.Error(w, err.Error(), status)
+		return
+	}
+
+	// get game
+	game, gameID, err := lichess.GetGame(maybeID)
+	if err != nil {
+		status = 500
+		http.Error(w, err.Error(), status)
+		return
+	}
+
+	// write gif
+	w.Header().Set("Content-Disposition", "attachment")
+	w.Header().Set("filename", gameID+".gif")
+	err = gifmaker.GenerateGIF(game, gameID, w)
+	if err != nil {
+		status = 500
+		http.Error(w, err.Error(), status)
+		return
+	}
+	status = 200
 }
 
 func GenerateFile(urlOrID string, outFile string) error {
