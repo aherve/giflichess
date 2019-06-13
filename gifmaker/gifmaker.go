@@ -10,7 +10,6 @@ import (
 	"image/gif"
 	"image/png"
 	"io"
-	"log"
 	"os"
 	"os/exec"
 	"sync"
@@ -19,11 +18,12 @@ import (
 type imgOutput struct {
 	index int
 	img   *image.Paletted
+	err   error
 }
 
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
 // This uses inkscape as a dependency
-func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
+func GenerateGIF(game *chess.Game, gameID string, out io.Writer) error {
 
 	// Generate PNGs
 	var wg sync.WaitGroup
@@ -42,7 +42,8 @@ func GenerateGIF(game *chess.Game, gameID string, out io.Writer) {
 		wg.Add(1)
 		go func(gameID string, i int, outChan chan imgOutput) {
 			defer wg.Done()
-			outChan <- imgOutput{i, encodeGIFImage(gameID, i)}
+			encoded, err := encodeGIFImage(gameID, i)
+			outChan <- imgOutput{i, encoded, err}
 		}(gameID, i, imgChan)
 
 	}
@@ -55,6 +56,9 @@ loop:
 	for {
 		select {
 		case res := <-imgChan:
+			if res.err != nil {
+				return res.err
+			}
 			images[res.index] = res.img
 		case <-quit:
 			break loop
@@ -77,35 +81,40 @@ loop:
 	}
 
 	gif.EncodeAll(out, outGIF)
+	return nil
 }
 
 // encodeGIFImage reads a png from gameID & index, and returns a palettedImage
-func encodeGIFImage(gameID string, i int) *image.Paletted {
+func encodeGIFImage(gameID string, i int) (*image.Paletted, error) {
 	f, err := os.Open(fileBaseFor(gameID, i) + ".png")
-	handle(err)
+	if err != nil {
+		return nil, err
+	}
 	defer f.Close()
 	inPNG, err := png.Decode(f)
-	handle(err)
+	if err != nil {
+		return nil, err
+	}
 
 	bounds := inPNG.Bounds()
 	palettedImage := image.NewPaletted(bounds, palette.Plan9)
 	draw.Draw(palettedImage, palettedImage.Rect, inPNG, bounds.Min, draw.Over)
 
-	return palettedImage
+	return palettedImage, nil
 }
 
-func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {
+func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) error {
 	defer wg.Done()
 
 	// create file
 	f, err := os.Create(filebase + ".svg")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// write board SVG to file
 	if err := chessimg.SVG(f, pos.Board()); err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// close svg file
@@ -113,8 +122,9 @@ func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) {
 
 	// Use inkscape to convert svg -> png
 	if r := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg").Run(); r != nil {
-		log.Fatal(err)
+		return err
 	}
+	return nil
 }
 
 func cleanup(gameID string, i int) {
@@ -125,10 +135,4 @@ func cleanup(gameID string, i int) {
 
 func fileBaseFor(gameID string, i int) string {
 	return "/tmp/" + gameID + fmt.Sprintf("%03d", i)
-}
-
-func handle(err error) {
-	if err != nil {
-		log.Fatal(err)
-	}
 }

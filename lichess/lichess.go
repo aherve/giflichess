@@ -49,7 +49,7 @@ func gameID(pathOrID string) (string, error) {
 
 	split := strings.Split(u.Path, "/")
 	if len(split) < 2 || len(split[1]) < 8 {
-		return "", fmt.Errorf("could not find id from string %s", pathOrID)
+		return "", fmt.Errorf("could not find id from string \"%s\"", pathOrID)
 	}
 	return split[1][0:8], nil
 }
