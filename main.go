@@ -75,9 +75,20 @@ func main() {
 }
 
 func serve(port int) {
+	http.HandleFunc("/ping", ping)
 	http.HandleFunc("/", gifHandler)
 	log.Println("starting server on port", port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
+}
+
+func ping(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	w.Header().Set("Content-Type", "application/json")
+	w.Write([]byte("{\"ping\": \"pong\"}"))
+	log := func() {
+		log.Println(r.Method, r.URL, 200, time.Since(start))
+	}
+	defer log()
 }
 
 func gifHandler(w http.ResponseWriter, r *http.Request) {
