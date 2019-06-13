@@ -1,0 +1,31 @@
+<div class="container" fxLayout="column" fxLayoutAlign="start start" fxLayoutGap="25px">
+
+  <h1>
+    Welcome to gifchess
+  </h1>
+
+  <h2>{{ content }}</h2>
+
+  <mat-divider fxFlexAlign="stretch"></mat-divider>
+
+  <form fxFlex="stretch" class="form" [formGroup]="form" (ngSubmit)="submit()">
+    <p>Get your own gif from a lichess game ID</p>
+    <mat-form-field class="input">
+      <mat-label> lichess game ID, or game url</mat-label>
+      <input matInput placeholder="example: bR4b8jno" formControlName="lichessID">
+      <mat-error>Please enter a lichess ID or lichess game url (min 8 characters)</mat-error>
+    </mat-form-field>
+  <button mat-stroked-button fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5 px">
+    <mat-icon>cloud_download</mat-icon>
+    <span> Download your game gif </span>
+  </button>
+  <p *ngIf="isLoading">Please wait while your gif is being generated... This might take some time</p>
+  </form>
+
+  <mat-divider fxFlexAlign="stretch"></mat-divider>
+
+  <div fxLayout="column" fxLayoutAlign="start center">
+    <img class="demo" src="assets/BI5pQatH.gif">
+    <p> Example output from game BI5pQatH</p>
+  </div>
+</div>

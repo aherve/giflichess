@@ -2,12 +2,31 @@ package lichess
 
 import (
 	"fmt"
+	"github.com/aherve/giflichess/gifmaker"
 	"github.com/notnil/chess"
 	"net/http"
 	"net/url"
+	"os"
 	"regexp"
 	"strings"
 )
+
+func GenerateFile(urlOrID string, outFile string) error {
+	fmt.Printf("generating file %s from game %s...\n", outFile, urlOrID)
+	game, gameID, err := GetGame(urlOrID)
+	if err != nil {
+		return err
+	}
+	f, err := os.OpenFile(outFile, os.O_WRONLY|os.O_CREATE, 0755)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+
+	gifmaker.GenerateGIF(game, gameID, f)
+	fmt.Printf("gif successfully outputed to %s\n", outFile)
+	return nil
+}
 
 // GetPGN extracts the PGN from a lichess game url
 func GetGame(pathOrID string) (*chess.Game, string, error) {
