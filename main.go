@@ -146,8 +146,8 @@ func generateFile(urlOrID string, outFile string) error {
 
 func getIDFromQuery(r *http.Request) (string, error) {
 	split := strings.Split(r.URL.Path, "/")
-	if len(split) < 2 {
-		return "", errors.New("could not find no id")
+	if len(split) < 2 || len(split[1]) < 8 {
+		return "", errors.New("No id provided. Please visit /some-id. Example: /bR4b8jno")
 	}
 	return split[1], nil
 }
