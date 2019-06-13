@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 
 @Component({
   selector: 'ah-root',
-  template: `<router-outlet></router-outlet>`,
+  template: `<ah-layout></ah-layout>`,
   styles: []
 })
 export class AppComponent {

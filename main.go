@@ -1,17 +1,12 @@
 package main
 
 import (
-	"errors"
 	"fmt"
-	"github.com/aherve/giflichess/gifmaker"
 	"github.com/aherve/giflichess/lichess"
+	"github.com/aherve/giflichess/server"
 	"github.com/urfave/cli"
 	"log"
-	"net/http"
 	"os"
-	"strconv"
-	"strings"
-	"time"
 )
 
 func main() {
@@ -32,7 +27,7 @@ func main() {
 				if len(input) == 0 {
 					return fmt.Errorf("Please pass an input game: example --game https://lichess.org/bR4b8jno")
 				}
-				return generateFile(input, output)
+				return lichess.GenerateFile(input, output)
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -54,7 +49,7 @@ func main() {
 			Aliases: []string{"s"},
 			Usage:   "run as a server",
 			Action: func(c *cli.Context) error {
-				serve(port)
+				server.Serve(port)
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -72,84 +67,4 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-}
-
-func serve(port int) {
-	fs := http.FileServer(http.Dir("frontend/dist/giflichess"))
-	http.HandleFunc("/ping", ping)
-	http.HandleFunc("/lichess/", lichessGifHandler)
-	http.Handle("/", fs)
-	log.Println("starting server on port", port)
-	http.ListenAndServe(":"+strconv.Itoa(port), nil)
-}
-
-func ping(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-	w.Header().Set("Content-Type", "application/json")
-	w.Write([]byte("{\"ping\": \"pong\"}"))
-	log := func() {
-		log.Println(r.Method, r.URL, 200, time.Since(start))
-	}
-	defer log()
-}
-
-func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-	var status int
-	log := func() {
-		log.Println(r.Method, r.URL, status, time.Since(start))
-	}
-	defer log()
-
-	// get ID
-	maybeID, err := getIDFromQuery(r)
-	if err != nil {
-		status = 400
-		http.Error(w, err.Error(), status)
-		return
-	}
-
-	// get game
-	game, gameID, err := lichess.GetGame(maybeID)
-	if err != nil {
-		status = 500
-		http.Error(w, err.Error(), status)
-		return
-	}
-
-	// write gif
-	w.Header().Set("Content-Disposition", "attachment")
-	w.Header().Set("filename", gameID+".gif")
-	err = gifmaker.GenerateGIF(game, gameID, w)
-	if err != nil {
-		status = 500
-		http.Error(w, err.Error(), status)
-		return
-	}
-	status = 200
-}
-
-func generateFile(urlOrID string, outFile string) error {
-	fmt.Printf("generating file %s from game %s...\n", outFile, urlOrID)
-	game, gameID, err := lichess.GetGame(urlOrID)
-	if err != nil {
-		return err
-	}
-	f, err := os.OpenFile(outFile, os.O_WRONLY|os.O_CREATE, 0755)
-	if err != nil {
-		return err
-	}
-	defer f.Close()
-
-	gifmaker.GenerateGIF(game, gameID, f)
-	fmt.Printf("gif successfully outputed to %s\n", outFile)
-	return nil
-}
-
-func getIDFromQuery(r *http.Request) (string, error) {
-	split := strings.Split(r.URL.Path, "/")
-	if len(split) < 3 || len(split[2]) < 8 {
-		return "", errors.New("No id provided. Please visit /some-id. Example: /bR4b8jno")
-	}
-	return split[2], nil
 }
