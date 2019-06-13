@@ -5,3 +5,6 @@
 
   - service: gotest
     command: go test ./...
+
+  - service: heroku
+    command: "sh -c giflichess help"

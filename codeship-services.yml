@@ -1,3 +1,7 @@
+heroku:
+  build:
+    path: .
+    dockerfile_path: 'Dockerfile.heroku'
 gobuild:
   build:
     path: .
