@@ -2,4 +2,4 @@ build:
   docker:
     web: Dockerfile.heroku
 run:
-  web: giflichess serve -p 80
+  web: giflichess serve -p $PORT
