@@ -30,7 +30,12 @@ export class HomeComponent implements OnInit {
   public submit() {
     if (!this.form.valid) { return }
     this.isLoading = true
-    window.location.href=`/lichess/${this.form.value.lichessID}`
+    const strip = this.form.value.lichessID
+      .replace('http://', '')
+      .replace('https://', '')
+      .replace('lichess.org', '')
+      .replace('/', '')
+    window.location.href=`/lichess/${strip}`
   }
 
 }
