@@ -21,19 +21,25 @@
     </button>
     <div *ngIf="isLoading">
       <p>Please wait while your gif is being generated... This might take some time</p>
-      <p>In the meantime, please consider a donation. Every 30$ will pay one server for one month. Enjoy !</p>
-      <ah-paypal></ah-paypal>
     </div>
   </form>
 
+
   <mat-divider fxFlexAlign="stretch"></mat-divider>
 
+  <div>
+    <p>This site is free, its servers are not. Please consider a donation to make things running as long as we can !</p>
+    <p>Every 30$ will pay one server for one month. Enjoy !</p>
+    <ah-paypal></ah-paypal>
+  </div>
+
+  <mat-divider fxFlexAlign="stretch"></mat-divider>
 
   <div fxLayout="column" fxLayoutAlign="start center">
     <img class="demo" src="assets/BI5pQatH.gif">
     <p> Example output from game BI5pQatH</p>
   </div>
 
-<share-buttons [show]="4"></share-buttons>
-  
+  <share-buttons [show]="4"></share-buttons>
+
 </div>
