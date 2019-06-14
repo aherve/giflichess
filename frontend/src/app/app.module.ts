@@ -11,13 +11,15 @@ import {LayoutComponent} from './components/layout/layout.component'
 import {MaterialModule} from 'src/app/material/material.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AnalyticsService} from 'src/app/analytics.service';
+import { PaypalComponent } from './paypal/paypal.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     HomeComponent,
     FooterComponent,
-    LayoutComponent
+    LayoutComponent,
+    PaypalComponent
   ],
   imports: [
     ReactiveFormsModule,

@@ -15,11 +15,15 @@
       <input matInput placeholder="example: bR4b8jno" formControlName="lichessID">
       <mat-error>Please enter a lichess ID or lichess game url (min 8 characters)</mat-error>
     </mat-form-field>
-  <button mat-stroked-button fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5 px">
-    <mat-icon>cloud_download</mat-icon>
-    <span> Download your game gif </span>
-  </button>
-  <p *ngIf="isLoading">Please wait while your gif is being generated... This might take some time</p>
+    <button mat-stroked-button fxLayout="row" fxLayoutAlign="start center" fxLayoutGap="5 px">
+      <mat-icon>cloud_download</mat-icon>
+      <span> Download your game gif </span>
+    </button>
+    <div *ngIf="isLoading">
+      <p>Please wait while your gif is being generated... This might take some time</p>
+      <p>In the meantime, please consider a donation. Every 30$ will pay one server for one month. Enjoy !</p>
+      <ah-paypal></ah-paypal>
+    </div>
   </form>
 
   <mat-divider fxFlexAlign="stretch"></mat-divider>
@@ -28,4 +32,5 @@
     <img class="demo" src="assets/BI5pQatH.gif">
     <p> Example output from game BI5pQatH</p>
   </div>
+  
 </div>

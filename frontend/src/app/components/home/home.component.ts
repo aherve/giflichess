@@ -9,7 +9,7 @@ import {FormGroup, Validators, FormBuilder} from '@angular/forms';
 })
 export class HomeComponent implements OnInit {
   public content = "Turn you lichess games into animated gifs"
-  public isLoading = false
+  public isLoading = true
   public form: FormGroup
 
   constructor(
