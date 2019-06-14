@@ -13,10 +13,9 @@ import (
 )
 
 func Serve(port int) {
-	fs := http.FileServer(http.Dir("frontend/dist/giflichess"))
 	http.HandleFunc("/ping", pingHandler)
 	http.HandleFunc("/lichess/", lichessGifHandler)
-	http.Handle("/", fs)
+	http.Handle("/", maxAgeHandler(60, http.FileServer(http.Dir("frontend/dist/giflichess"))))
 	log.Println("starting server on port", port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
@@ -44,6 +43,7 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	maybeID, err := getIDFromQuery(r)
 	if err != nil {
 		status = 400
+		w.Header().Set("Cache-Control", "no-cache")
 		http.Error(w, err.Error(), status)
 		return
 	}
@@ -52,6 +52,7 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	game, gameID, err := lichess.GetGame(maybeID)
 	if err != nil {
 		status = 500
+		w.Header().Set("Cache-Control", "no-cache")
 		http.Error(w, err.Error(), status)
 		return
 	}
@@ -59,7 +60,7 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	// write gif
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.gif\"", gameID))
 	w.Header().Set("filename", gameID+".gif")
-	w.Header().Set("Cache-Control", "max-age=1296000")
+	w.Header().Set("Cache-Control", cacheControl(1296000))
 	err = gifmaker.GenerateGIF(game, gameID, w)
 	if err != nil {
 		status = 500
@@ -76,4 +77,15 @@ func getIDFromQuery(r *http.Request) (string, error) {
 		return "", errors.New("No id provided. Please visit /some-id. Example: /bR4b8jno")
 	}
 	return split[2], nil
+}
+
+func maxAgeHandler(seconds int, h http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Cache-Control", cacheControl(seconds))
+		h.ServeHTTP(w, r)
+	})
+}
+
+func cacheControl(seconds int) string {
+	return fmt.Sprintf("max-age=%d, public, must-revalidate, proxy-revalidate", seconds)
 }
