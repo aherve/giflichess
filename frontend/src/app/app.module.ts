@@ -1,3 +1,4 @@
+import '../icons'
 import {BrowserModule} from '@angular/platform-browser';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {NgModule} from '@angular/core';
@@ -12,6 +13,8 @@ import {MaterialModule} from 'src/app/material/material.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
 import {AnalyticsService} from 'src/app/analytics.service';
 import { PaypalComponent } from './paypal/paypal.component';
+import {HttpClientModule} from '@angular/common/http';
+import {ShareButtonsModule} from '@ngx-share/buttons'
 
 @NgModule({
   declarations: [
@@ -22,6 +25,8 @@ import { PaypalComponent } from './paypal/paypal.component';
     PaypalComponent
   ],
   imports: [
+    HttpClientModule,
+    ShareButtonsModule,
     ReactiveFormsModule,
     FormsModule,
     MaterialModule,
