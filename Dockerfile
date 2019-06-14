@@ -1,12 +1,12 @@
-FROM golang:alpine
+FROM golang:1.12.6-stretch
 RUN mkdir /app
 WORKDIR /app
 
-RUN apk add --no-cache inkscape git
+RUN apt update && apt install inkscape git -y
 
 ADD . .
 
-RUN go build -o giflichess && \
-      apk del git
+RUN go build -o giflichess
 
+EXPOSE 8080
 ENTRYPOINT ["./giflichess"]
