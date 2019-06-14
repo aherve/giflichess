@@ -11,7 +11,6 @@ import {FooterComponent} from './components/footer/footer.component';
 import {LayoutComponent} from './components/layout/layout.component'
 import {MaterialModule} from 'src/app/material/material.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
-import {AnalyticsService} from 'src/app/analytics.service';
 import { PaypalComponent } from './paypal/paypal.component';
 import {HttpClientModule} from '@angular/common/http';
 import {ShareButtonsModule} from '@ngx-share/buttons'
@@ -35,7 +34,7 @@ import {ShareButtonsModule} from '@ngx-share/buttons'
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [AnalyticsService],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

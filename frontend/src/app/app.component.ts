@@ -1,5 +1,4 @@
 import { Component } from '@angular/core';
-import {AnalyticsService} from 'src/app/analytics.service';
 
 @Component({
   selector: 'ah-root',
@@ -7,5 +6,5 @@ import {AnalyticsService} from 'src/app/analytics.service';
   styles: []
 })
 export class AppComponent {
-  constructor(_: AnalyticsService) {}
+  constructor() {}
 }
