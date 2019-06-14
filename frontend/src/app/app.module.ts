@@ -10,6 +10,7 @@ import {FooterComponent} from './components/footer/footer.component';
 import {LayoutComponent} from './components/layout/layout.component'
 import {MaterialModule} from 'src/app/material/material.module';
 import {FormsModule, ReactiveFormsModule} from '@angular/forms';
+import {AnalyticsService} from 'src/app/analytics.service';
 
 @NgModule({
   declarations: [
@@ -27,7 +28,7 @@ import {FormsModule, ReactiveFormsModule} from '@angular/forms';
     BrowserModule,
     AppRoutingModule
   ],
-  providers: [],
+  providers: [AnalyticsService],
   bootstrap: [AppComponent]
 })
-export class AppModule {}
+export class AppModule { }

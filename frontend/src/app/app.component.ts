@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import {AnalyticsService} from 'src/app/analytics.service';
 
 @Component({
   selector: 'ah-root',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styles: []
 })
 export class AppComponent {
-  title = 'giflichess';
+  constructor(_: AnalyticsService) {}
 }
