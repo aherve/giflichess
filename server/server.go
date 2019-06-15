@@ -13,9 +13,10 @@ import (
 )
 
 func Serve(port int) {
-	http.HandleFunc("/ping", pingHandler)
-	http.HandleFunc("/lichess/", lichessGifHandler)
+	http.HandleFunc("/api/ping", pingHandler)
+	http.HandleFunc("/api/lichess/", lichessGifHandler)
 	http.HandleFunc("/", rootHandler)
+	http.HandleFunc("/api", rootHandler)
 	log.Println("starting server on port", port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
@@ -23,7 +24,7 @@ func Serve(port int) {
 func rootHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	w.Header().Set("Cache-Control", "no-cache")
-	w.Write([]byte("<html><head></head><body><h1>Hello</h1> <p>visit /lichess/:id to get a lichess game</p></body></html>"))
+	w.Write([]byte("<html><head></head><body><h1>Hello</h1> <p>visit /api/lichess/:id to get a lichess game</p></body></html>"))
 	log := func() {
 		log.Println(r.Method, r.URL, 200, time.Since(start))
 	}
@@ -83,10 +84,10 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 
 func getIDFromQuery(r *http.Request) (string, error) {
 	split := strings.Split(r.URL.Path, "/")
-	if len(split) < 3 || len(split[2]) < 8 {
+	if len(split) < 4 || len(split[3]) < 8 {
 		return "", errors.New("No id provided. Please visit /some-id. Example: /bR4b8jno")
 	}
-	return split[2], nil
+	return split[3], nil
 }
 
 func cacheControl(seconds int) string {
