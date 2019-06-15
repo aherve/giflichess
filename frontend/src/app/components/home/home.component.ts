@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Meta } from '@angular/platform-browser'
 import {FormGroup, Validators, FormBuilder} from '@angular/forms';
+import {AnalyticsService} from 'src/app/analytics.service';
 
 @Component({
   selector: 'ah-home',
@@ -15,6 +16,7 @@ export class HomeComponent implements OnInit {
   constructor(
     private meta: Meta,
     private fb: FormBuilder,
+    private analytics: AnalyticsService,
   ) { }
 
   public ngOnInit () {
@@ -30,6 +32,11 @@ export class HomeComponent implements OnInit {
   public submit() {
     if (!this.form.valid) { return }
     this.isLoading = true
+    this.analytics.trackEvent({
+      eventCategory: 'lichess',
+      eventAction: 'loadGIF',
+      eventLabel: this.form.value.lichessID,
+    })
     const strip = this.form.value.lichessID
       .replace('http://', '')
       .replace('https://', '')
