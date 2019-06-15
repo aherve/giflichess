@@ -3,6 +3,8 @@ GifLichess
 
 Convert a lichess game to an animated gif
 
+[![Codeship Status for aherve/giflichess](https://app.codeship.com/projects/c112da50-6f80-0137-e723-4eb9bb858fd8/status?branch=master)](https://app.codeship.com/projects/347695)
+
 ![example gif](assets/example.gif)
 
 ## Table Of Contents
@@ -25,13 +27,17 @@ Convert a lichess game to an animated gif
 
 ## Usage
 
-1. Command-line interface
+### 1. Browse official website
+
+- simply go to [gifchess.com](https://gifchess.com) and profit !
+
+### 2. Command-line interface
 
 - with docker: `docker run -v $HOME:/app/out aherve/giflichess generate --game BI5pQatH -o /app/out/out.gif` will get game BI5pQatH from lichess, and output `out.gif` to your home
 - using go install: `giflichess generate --game BI5pQatH -o out.gif` will get game BI5pQatH from lichess, and output a gif to `out.gif`
 - use `giflichess help generate` or `docker run aherve/giflichess help generate` to get a full list of commands and options
 
-2. Server
+### 3. Start your own server
 - with docker: `docker run -p 8080:8080 aherve/giflichess serve` will start a server on port 8080
 - using go install: `giflichess serve ` will start a server on port 8080
 
