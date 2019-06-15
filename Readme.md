@@ -1,7 +1,7 @@
 GifLichess
 ==========
 
-Convert a lichess game to an animated gif
+Golang application that converts any lichess game to an animated gif.
 
 [![Codeship Status for aherve/giflichess](https://app.codeship.com/projects/c112da50-6f80-0137-e723-4eb9bb858fd8/status?branch=master)](https://app.codeship.com/projects/347695)
 
