@@ -15,9 +15,19 @@ import (
 func Serve(port int) {
 	http.HandleFunc("/ping", pingHandler)
 	http.HandleFunc("/lichess/", lichessGifHandler)
-	http.Handle("/", maxAgeHandler(60, http.FileServer(http.Dir("frontend/dist/giflichess"))))
+	http.HandleFunc("/", rootHandler)
 	log.Println("starting server on port", port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
+}
+
+func rootHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	w.Header().Set("Cache-Control", "no-cache")
+	w.Write([]byte("<html><head></head><body><h1>Hello</h1> <p>visit /lichess/:id to get a lichess game</p></body></html>"))
+	log := func() {
+		log.Println(r.Method, r.URL, 200, time.Since(start))
+	}
+	defer log()
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
@@ -77,13 +87,6 @@ func getIDFromQuery(r *http.Request) (string, error) {
 		return "", errors.New("No id provided. Please visit /some-id. Example: /bR4b8jno")
 	}
 	return split[2], nil
-}
-
-func maxAgeHandler(seconds int, h http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Cache-Control", cacheControl(seconds))
-		h.ServeHTTP(w, r)
-	})
 }
 
 func cacheControl(seconds int) string {
