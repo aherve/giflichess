@@ -40,9 +40,8 @@ func blackName(game *chess.Game) string {
 }
 
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
-// This uses inkscape as a dependency
+// This uses inkscape & imagemagick as a dependency
 func GenerateGIF(game *chess.Game, gameID string, out io.Writer) error {
-	fmt.Println(game.TagPairs()[1].Key)
 
 	// Generate PNGs
 	var wg sync.WaitGroup
@@ -52,6 +51,14 @@ func GenerateGIF(game *chess.Game, gameID string, out io.Writer) error {
 		defer cleanup(gameID, i)
 	}
 	wg.Wait()
+
+	// add Result to last png image
+	fileName := fileBaseFor(gameID, len(game.Positions())-1) + ".png"
+	cmd := exec.Command("gifmaker/addResult.sh", fileName, game.Outcome().String())
+	cmd.Stderr = os.Stderr
+	if err := cmd.Run(); err != nil {
+		return err
+	}
 
 	// Generate atomic GIFs
 	images := make([]*image.Paletted, len(game.Positions()), len(game.Positions()))
