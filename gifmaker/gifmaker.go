@@ -167,7 +167,6 @@ func drawPNG(pos *chess.Position, whiteName string, blackName string, filebase s
 }
 
 func cleanup(gameID string, i int) {
-	return
 	fileBase := fileBaseFor(gameID, i)
 	os.Remove(fileBase + ".svg")
 	os.Remove(fileBase + ".png")
