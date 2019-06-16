@@ -2,7 +2,7 @@ FROM golang:1.12.6-stretch
 RUN mkdir /app
 WORKDIR /app
 
-RUN apt update && apt install inkscape git -y
+RUN apt update && apt install inkscape imagemagick git -y
 
 ADD . .
 

@@ -21,15 +21,34 @@ type imgOutput struct {
 	err   error
 }
 
+func whiteName(game *chess.Game) string {
+	for _, tag := range game.TagPairs() {
+		if tag.Key == "White" || tag.Key == "white" {
+			return tag.Value
+		}
+	}
+	return "unknown"
+}
+
+func blackName(game *chess.Game) string {
+	for _, tag := range game.TagPairs() {
+		if tag.Key == "Black" || tag.Key == "black" {
+			return tag.Value
+		}
+	}
+	return "unknown"
+}
+
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
 // This uses inkscape as a dependency
 func GenerateGIF(game *chess.Game, gameID string, out io.Writer) error {
+	fmt.Println(game.TagPairs()[1].Key)
 
 	// Generate PNGs
 	var wg sync.WaitGroup
 	for i, pos := range game.Positions() {
 		wg.Add(1)
-		go drawPNG(pos, fileBaseFor(gameID, i), &wg)
+		go drawPNG(pos, whiteName(game), blackName(game), fileBaseFor(gameID, i), &wg)
 		defer cleanup(gameID, i)
 	}
 	wg.Wait()
@@ -103,7 +122,11 @@ func encodeGIFImage(gameID string, i int) (*image.Paletted, error) {
 	return palettedImage, nil
 }
 
-func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) error {
+func annotatePNG(filebase string, whiteName string, blackName string, wg *sync.WaitGroup) {
+
+}
+
+func drawPNG(pos *chess.Position, whiteName string, blackName string, filebase string, wg *sync.WaitGroup) error {
 	defer wg.Done()
 
 	// create file
@@ -121,13 +144,23 @@ func drawPNG(pos *chess.Position, filebase string, wg *sync.WaitGroup) error {
 	f.Close()
 
 	// Use inkscape to convert svg -> png
-	if r := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg").Run(); r != nil {
+	cmd := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg")
+	cmd.Stderr = os.Stderr
+	if r := cmd.Run(); r != nil {
+		return err
+	}
+
+	// add annotation
+	cmd = exec.Command("gifmaker/annotate.sh", filebase+".png", whiteName, blackName)
+	cmd.Stderr = os.Stderr
+	if r := cmd.Run(); r != nil {
 		return err
 	}
 	return nil
 }
 
 func cleanup(gameID string, i int) {
+	return
 	fileBase := fileBaseFor(gameID, i)
 	os.Remove(fileBase + ".svg")
 	os.Remove(fileBase + ".png")
