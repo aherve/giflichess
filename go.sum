@@ -1,3 +1,7 @@
+github.com/aherve/chessimg v0.0.0-20190617203414-a33aa05c2516 h1:LM/MrD2ifxtKdjqJL6/xRzYPB33gXkCroaMYWiDLiBc=
+github.com/aherve/chessimg v0.0.0-20190617203414-a33aa05c2516/go.mod h1:vTzETqueTl73Q4VoYVLvNrsCBsjuuU1AV7abaDZaRH0=
+github.com/aherve/chessimg v0.0.0-20190617204207-a9dd1383a101 h1:80znpkJuUn3EZpG8oDsBoEy64x+jndC4UTBF3g6ftpA=
+github.com/aherve/chessimg v0.0.0-20190617204207-a9dd1383a101/go.mod h1:vTzETqueTl73Q4VoYVLvNrsCBsjuuU1AV7abaDZaRH0=
 github.com/ajstarks/svgo v0.0.0-20181006003313-6ce6a3bcf6cd h1:JdtityihAc6A+gVfYh6vGXfZQg+XOLyBvla/7NbXFCg=
 github.com/ajstarks/svgo v0.0.0-20181006003313-6ce6a3bcf6cd/go.mod h1:K08gAheRH3/J6wwsYMMT4xOr94bZjxIelGM0+d/wbFw=
 github.com/notnil/chess v0.0.0-20190406150930-2ad5c7f990b6 h1:eMiZj4RFkr+NuFcJbyFcHxBYdrmdzcC9R2NW2LxqbkU=

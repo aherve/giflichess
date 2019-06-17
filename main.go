@@ -13,6 +13,7 @@ func main() {
 	var output string
 	var input string
 	var port int
+	var reversed bool
 	app := cli.NewApp()
 	app.Name = "giflichess"
 	app.Usage = "generate fancy gifs from your lichess games"
@@ -27,7 +28,7 @@ func main() {
 				if len(input) == 0 {
 					return fmt.Errorf("Please pass an input game: example --game https://lichess.org/bR4b8jno")
 				}
-				return lichess.GenerateFile(input, output)
+				return lichess.GenerateFile(input, reversed, output)
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -41,6 +42,11 @@ func main() {
 					Value:       "out.gif",
 					Usage:       "output file path",
 					Destination: &output,
+				},
+				cli.BoolFlag{
+					Name:        "reversed, r",
+					Usage:       "Flip board",
+					Destination: &reversed,
 				},
 			},
 		},

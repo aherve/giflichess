@@ -2,8 +2,8 @@ package gifmaker
 
 import (
 	"fmt"
+	"github.com/aherve/chessimg"
 	"github.com/notnil/chess"
-	"github.com/notnil/chessimg"
 	"image"
 	"image/color/palette"
 	"image/draw"
@@ -66,13 +66,13 @@ func blackName(game *chess.Game) string {
 
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
 // This uses inkscape & imagemagick as a dependency
-func GenerateGIF(game *chess.Game, gameID string, out io.Writer) error {
+func GenerateGIF(game *chess.Game, gameID string, reversed bool, out io.Writer) error {
 
 	// Generate PNGs
 	var wg sync.WaitGroup
 	for i, pos := range game.Positions() {
 		wg.Add(1)
-		go drawPNG(pos, whiteName(game), blackName(game), fileBaseFor(gameID, i), &wg)
+		go drawPNG(pos, whiteName(game), blackName(game), reversed, fileBaseFor(gameID, i), &wg)
 		defer cleanup(gameID, i)
 	}
 	wg.Wait()
@@ -158,7 +158,7 @@ func annotatePNG(filebase string, whiteName string, blackName string, wg *sync.W
 
 }
 
-func drawPNG(pos *chess.Position, whiteName string, blackName string, filebase string, wg *sync.WaitGroup) error {
+func drawPNG(pos *chess.Position, whiteName string, blackName string, reversed bool, filebase string, wg *sync.WaitGroup) error {
 	defer wg.Done()
 
 	// create file
@@ -168,7 +168,12 @@ func drawPNG(pos *chess.Position, whiteName string, blackName string, filebase s
 	}
 
 	// write board SVG to file
-	if err := chessimg.SVG(f, pos.Board()); err != nil {
+	if reversed {
+		err = chessimg.ReversedSVG(f, pos.Board())
+	} else {
+		err = chessimg.SVG(f, pos.Board())
+	}
+	if err != nil {
 		return err
 	}
 

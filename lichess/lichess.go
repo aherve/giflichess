@@ -11,7 +11,7 @@ import (
 	"strings"
 )
 
-func GenerateFile(urlOrID string, outFile string) error {
+func GenerateFile(urlOrID string, reversed bool, outFile string) error {
 	fmt.Printf("generating file %s from game %s...\n", outFile, urlOrID)
 	game, gameID, err := GetGame(urlOrID)
 	if err != nil {
@@ -23,7 +23,7 @@ func GenerateFile(urlOrID string, outFile string) error {
 	}
 	defer f.Close()
 
-	gifmaker.GenerateGIF(game, gameID, f)
+	gifmaker.GenerateGIF(game, gameID, reversed, f)
 	fmt.Printf("gif successfully outputed to %s\n", outFile)
 	return nil
 }

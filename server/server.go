@@ -72,7 +72,7 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.gif\"", gameID))
 	w.Header().Set("filename", gameID+".gif")
 	w.Header().Set("Cache-Control", cacheControl(1296000))
-	err = gifmaker.GenerateGIF(game, gameID, w)
+	err = gifmaker.GenerateGIF(game, gameID, getReversed(r), w)
 	if err != nil {
 		status = 500
 		w.Header().Set("Cache-Control", "no-cache")
@@ -80,6 +80,13 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	status = 200
+}
+
+func getReversed(r *http.Request) bool {
+	if s, ok := r.URL.Query()["reversed"]; ok && len(s) == 1 {
+		return s[0] == "true"
+	}
+	return false
 }
 
 func getIDFromQuery(r *http.Request) (string, error) {
