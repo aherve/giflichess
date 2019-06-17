@@ -38,7 +38,7 @@ func main() {
 					Destination: &input,
 				},
 				cli.StringFlag{
-					Name:        "ouput, o",
+					Name:        "output, o",
 					Value:       "out.gif",
 					Usage:       "output file path",
 					Destination: &output,
