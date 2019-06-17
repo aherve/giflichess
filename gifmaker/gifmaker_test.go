@@ -18,10 +18,10 @@ func TestWhiteName(t *testing.T) {
 
 	game := chess.NewGame(readPGN)
 
-	if white := whiteName(game); white != "aherve" {
-		t.Error("expected white to == aherve, got ", white)
+	if white := whiteName(game); white != "aherve (1527)" {
+		t.Error("expected white to == aherve (1527), got ", white)
 	}
-	if black := blackName(game); black != "minahabibzadeeh" {
-		t.Error("expected white to == aherve, got ", black)
+	if black := blackName(game); black != "minahabibzadeeh (1558)" {
+		t.Error("expected black to == minahabibzadeeh (1558), got ", black)
 	}
 }

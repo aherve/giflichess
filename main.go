@@ -17,7 +17,7 @@ func main() {
 	app.Name = "giflichess"
 	app.Usage = "generate fancy gifs from your lichess games"
 	app.Description = "giflichess can turn a lichess game id into an animated gif. You can either use this program as a cli tool, or as a web server"
-	app.Version = "1.1.1"
+	app.Version = Version
 	app.Commands = []cli.Command{
 		{
 			Name:    "generate",
@@ -68,3 +68,5 @@ func main() {
 		log.Fatal(err)
 	}
 }
+
+const Version = "1.1.2"

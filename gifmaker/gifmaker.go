@@ -12,6 +12,7 @@ import (
 	"io"
 	"os"
 	"os/exec"
+	"strings"
 	"sync"
 )
 
@@ -22,19 +23,43 @@ type imgOutput struct {
 }
 
 func whiteName(game *chess.Game) string {
+	var elo, name string
 	for _, tag := range game.TagPairs() {
-		if tag.Key == "White" || tag.Key == "white" {
-			return tag.Value
+		if strings.ToLower(tag.Key) == "white" {
+			name = tag.Value
 		}
+		if strings.ToLower(tag.Key) == "whiteelo" {
+			elo = tag.Value
+		}
+		if len(elo) > 0 && len(name) > 0 {
+			break
+		}
+	}
+	if len(name) > 0 && len(elo) > 0 {
+		return fmt.Sprintf("%s (%s)", name, elo)
+	} else if len(name) > 0 {
+		return name
 	}
 	return "unknown"
 }
 
 func blackName(game *chess.Game) string {
+	var elo, name string
 	for _, tag := range game.TagPairs() {
-		if tag.Key == "Black" || tag.Key == "black" {
-			return tag.Value
+		if strings.ToLower(tag.Key) == "black" {
+			name = tag.Value
 		}
+		if strings.ToLower(tag.Key) == "blackelo" {
+			elo = tag.Value
+		}
+		if len(elo) > 0 && len(name) > 0 {
+			break
+		}
+	}
+	if len(name) > 0 && len(elo) > 0 {
+		return fmt.Sprintf("%s (%s)", name, elo)
+	} else if len(name) > 0 {
+		return name
 	}
 	return "unknown"
 }
