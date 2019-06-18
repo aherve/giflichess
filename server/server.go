@@ -7,6 +7,7 @@ import (
 	"github.com/aherve/giflichess/lichess"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -17,7 +18,7 @@ func Serve(port int) {
 	http.HandleFunc("/api/lichess/", lichessGifHandler)
 	http.HandleFunc("/", rootHandler)
 	http.HandleFunc("/api", rootHandler)
-	log.Println("starting server on port", port)
+	log.Printf("starting %s server on port %v\n", env(), port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
 
@@ -71,7 +72,12 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	// write gif
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.gif\"", gameID))
 	w.Header().Set("filename", gameID+".gif")
-	w.Header().Set("Cache-Control", cacheControl(1296000))
+	if env() == "production" {
+		w.Header().Set("Cache-Control", cacheControl(1296000))
+	} else {
+		w.Header().Set("Cache-Control", "no-cache")
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+	}
 	err = gifmaker.GenerateGIF(game, gameID, getReversed(r), w)
 	if err != nil {
 		status = 500
@@ -99,4 +105,12 @@ func getIDFromQuery(r *http.Request) (string, error) {
 
 func cacheControl(seconds int) string {
 	return fmt.Sprintf("max-age=%d, public, must-revalidate, proxy-revalidate", seconds)
+}
+
+func env() string {
+	fromEnv := os.Getenv("APP_ENV")
+	if len(fromEnv) > 0 {
+		return fromEnv
+	}
+	return "development"
 }
