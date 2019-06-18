@@ -1,10 +1,14 @@
 package server
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"github.com/aherve/giflichess/gifmaker"
 	"github.com/aherve/giflichess/lichess"
+	"github.com/notnil/chess"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,6 +18,7 @@ import (
 )
 
 func Serve(port int) {
+	http.HandleFunc("/api/pgn", pgnGifHandler)
 	http.HandleFunc("/api/ping", pingHandler)
 	http.HandleFunc("/api/lichess/", lichessGifHandler)
 	http.HandleFunc("/", rootHandler)
@@ -26,10 +31,10 @@ func rootHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Write([]byte("<html><head></head><body><h1>Hello</h1> <p>visit /api/lichess/:id to get a lichess game</p></body></html>"))
-	log := func() {
+	logReq := func() {
 		log.Println(r.Method, r.URL, 200, time.Since(start))
 	}
-	defer log()
+	defer logReq()
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
@@ -37,19 +42,19 @@ func pingHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Write([]byte("{\"ping\": \"pong\"}"))
-	log := func() {
+	logReq := func() {
 		log.Println(r.Method, r.URL, 200, time.Since(start))
 	}
-	defer log()
+	defer logReq()
 }
 
 func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	start := time.Now()
 	var status int
-	log := func() {
+	logReq := func() {
 		log.Println(r.Method, r.URL, status, time.Since(start))
 	}
-	defer log()
+	defer logReq()
 
 	// get ID
 	maybeID, err := getIDFromQuery(r)
@@ -70,6 +75,10 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// write gif
+	htmlGifWriter(gameID, game, w, r, &status)
+}
+
+func htmlGifWriter(gameID string, game *chess.Game, w http.ResponseWriter, r *http.Request, status *int) {
 	w.Header().Set("Content-Disposition", fmt.Sprintf("attachment; filename=\"%s.gif\"", gameID))
 	w.Header().Set("filename", gameID+".gif")
 	if env() == "production" {
@@ -78,14 +87,52 @@ func lichessGifHandler(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Cache-Control", "no-cache")
 		w.Header().Set("Access-Control-Allow-Origin", "*")
 	}
-	err = gifmaker.GenerateGIF(game, gameID, getReversed(r), w)
+	err := gifmaker.GenerateGIF(game, gameID, getReversed(r), w)
 	if err != nil {
-		status = 500
+		w.Header().Set("Cache-Control", "no-cache")
+		http.Error(w, err.Error(), *status)
+		return
+	}
+	*status = 200
+}
+
+func pgnGifHandler(w http.ResponseWriter, r *http.Request) {
+	start := time.Now()
+	var status int
+	logReq := func() {
+		log.Println(r.Method, r.URL, status, time.Since(start))
+	}
+	defer logReq()
+	if r.Method != "POST" {
+		status = http.StatusMethodNotAllowed
+		http.Error(w, "Invalid request method", status)
+	}
+
+	// get body
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		status = 400
 		w.Header().Set("Cache-Control", "no-cache")
 		http.Error(w, err.Error(), status)
 		return
 	}
-	status = 200
+
+	// create game
+	log.Println(string(body))
+	pgn, err := chess.PGN(r.Body)
+	if err != nil {
+		status = 400
+		w.Header().Set("Cache-Control", "no-cache")
+		http.Error(w, err.Error(), status)
+		return
+	}
+	game := chess.NewGame(pgn)
+	log.Println(game.Positions())
+	hash := md5.Sum(body)
+	gameID := hex.EncodeToString(hash[:])
+
+	// write gif
+	htmlGifWriter(gameID, game, w, r, &status)
 }
 
 func getReversed(r *http.Request) bool {

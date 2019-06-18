@@ -22,48 +22,6 @@ type imgOutput struct {
 	err   error
 }
 
-func whiteName(game *chess.Game) string {
-	var elo, name string
-	for _, tag := range game.TagPairs() {
-		if strings.ToLower(tag.Key) == "white" {
-			name = tag.Value
-		}
-		if strings.ToLower(tag.Key) == "whiteelo" {
-			elo = tag.Value
-		}
-		if len(elo) > 0 && len(name) > 0 {
-			break
-		}
-	}
-	if len(name) > 0 && len(elo) > 0 {
-		return fmt.Sprintf("%s (%s)", name, elo)
-	} else if len(name) > 0 {
-		return name
-	}
-	return "unknown"
-}
-
-func blackName(game *chess.Game) string {
-	var elo, name string
-	for _, tag := range game.TagPairs() {
-		if strings.ToLower(tag.Key) == "black" {
-			name = tag.Value
-		}
-		if strings.ToLower(tag.Key) == "blackelo" {
-			elo = tag.Value
-		}
-		if len(elo) > 0 && len(name) > 0 {
-			break
-		}
-	}
-	if len(name) > 0 && len(elo) > 0 {
-		return fmt.Sprintf("%s (%s)", name, elo)
-	} else if len(name) > 0 {
-		return name
-	}
-	return "unknown"
-}
-
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
 // This uses inkscape & imagemagick as a dependency
 func GenerateGIF(game *chess.Game, gameID string, reversed bool, out io.Writer) error {
@@ -204,4 +162,46 @@ func cleanup(gameID string, i int) {
 
 func fileBaseFor(gameID string, i int) string {
 	return "/tmp/" + gameID + fmt.Sprintf("%03d", i)
+}
+
+func whiteName(game *chess.Game) string {
+	var elo, name string
+	for _, tag := range game.TagPairs() {
+		if strings.ToLower(tag.Key) == "white" {
+			name = tag.Value
+		}
+		if strings.ToLower(tag.Key) == "whiteelo" {
+			elo = tag.Value
+		}
+		if len(elo) > 0 && len(name) > 0 {
+			break
+		}
+	}
+	if len(name) > 0 && len(elo) > 0 {
+		return fmt.Sprintf("%s (%s)", name, elo)
+	} else if len(name) > 0 {
+		return name
+	}
+	return "unknown"
+}
+
+func blackName(game *chess.Game) string {
+	var elo, name string
+	for _, tag := range game.TagPairs() {
+		if strings.ToLower(tag.Key) == "black" {
+			name = tag.Value
+		}
+		if strings.ToLower(tag.Key) == "blackelo" {
+			elo = tag.Value
+		}
+		if len(elo) > 0 && len(name) > 0 {
+			break
+		}
+	}
+	if len(name) > 0 && len(elo) > 0 {
+		return fmt.Sprintf("%s (%s)", name, elo)
+	} else if len(name) > 0 {
+		return name
+	}
+	return "unknown"
 }
