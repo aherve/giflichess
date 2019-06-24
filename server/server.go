@@ -16,20 +16,9 @@ import (
 func Serve(port int) {
 	http.HandleFunc("/api/ping", pingHandler)
 	http.HandleFunc("/api/lichess/", lichessGifHandler)
-	http.HandleFunc("/", rootHandler)
-	http.HandleFunc("/api", rootHandler)
+	http.Handle("/", http.FileServer(http.Dir("frontend")))
 	log.Printf("starting %s server on port %v\n", env(), port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
-}
-
-func rootHandler(w http.ResponseWriter, r *http.Request) {
-	start := time.Now()
-	w.Header().Set("Cache-Control", "no-cache")
-	w.Write([]byte("<html><head></head><body><h1>Hello</h1> <p>visit /api/lichess/:id to get a lichess game</p></body></html>"))
-	log := func() {
-		log.Println(r.Method, r.URL, 200, time.Since(start))
-	}
-	defer log()
 }
 
 func pingHandler(w http.ResponseWriter, r *http.Request) {
