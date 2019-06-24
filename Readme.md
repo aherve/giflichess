@@ -7,7 +7,7 @@ Golang application that converts any lichess game to an animated gif.
 
 ![example gif](assets/example.gif)
 
-- [Live app](https://gifchess.com)
+- ~~[Live app](https://gifchess.com)~~ (deprecated for cost reasons)
 - [Frontend repo](https://github.com/aherve/gifchess-front)
 
 ## Table Of Contents
@@ -26,23 +26,22 @@ Golang application that converts any lichess game to an animated gif.
 2. Install inkscape (_e.g._ `sudo apt install inkscape`)
 3. Install dependencies with `go get`
 4. Compile sources with `go build`
-5. Install with `go install`
+5. Install with `go install -i`
 
 ## Usage
 
 ### 1. Browse official website
 
-- simply go to [gifchess.com](https://gifchess.com) and profit !
+- ~~simply go to [gifchess.com](https://gifchess.com) and profit !~~
 
-### 2. Command-line interface
+### 2. CLI usage
 
 - with docker: `docker run -v $HOME:/app/out aherve/giflichess generate --game BI5pQatH -o /app/out/out.gif` will get game BI5pQatH from lichess, and output `out.gif` to your home
 - using go install: `giflichess generate --game BI5pQatH -o out.gif` will get game BI5pQatH from lichess, and output a gif to `out.gif`
 - use `giflichess help generate` or `docker run aherve/giflichess help generate` to get a full list of commands and options
 
-### 3. Start your own server
+### 3. Server usage
 - with docker: `docker run -p 8080:8080 aherve/giflichess serve` will start a server on port 8080
 - using go install: `giflichess serve ` will start a server on port 8080
 
-- Browse `http://localhost:8080/api/lichess/BI5pQatH` to create a gif from the lichess game `BI5pQatH`
-- run `giflichess help serve` or `docker run aherve/giflichess help serve` to get a full list of commands and options
+- Browse `http://localhost:8080` to see your app
