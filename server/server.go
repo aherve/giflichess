@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/aherve/giflichess/gifmaker"
 	"github.com/aherve/giflichess/lichess"
-	"github.com/gobuffalo/packr/v2"
 	"log"
 	"net/http"
 	"os"
@@ -14,11 +13,10 @@ import (
 	"time"
 )
 
+// Serve starts a server
 func Serve(port int) {
 	http.HandleFunc("/api/ping", pingHandler)
 	http.HandleFunc("/api/lichess/", lichessGifHandler)
-	box := packr.New("frontend", "./frontend")
-	http.Handle("/", http.FileServer(box))
 	log.Printf("starting %s server on port %v\n", env(), port)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
