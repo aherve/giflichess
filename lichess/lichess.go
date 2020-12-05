@@ -2,15 +2,17 @@ package lichess
 
 import (
 	"fmt"
-	"github.com/aherve/giflichess/gifmaker"
-	"github.com/notnil/chess"
 	"net/http"
 	"net/url"
 	"os"
 	"regexp"
 	"strings"
+
+	"github.com/aherve/giflichess/gifmaker"
+	"github.com/notnil/chess"
 )
 
+// GenerateFile generates a file from an url or gameID, into `outFile`. `reversed` can be set to true to view the game from black's perspective
 func GenerateFile(urlOrID string, reversed bool, outFile string) error {
 	fmt.Printf("generating file %s from game %s...\n", outFile, urlOrID)
 	game, gameID, err := GetGame(urlOrID)
@@ -28,7 +30,7 @@ func GenerateFile(urlOrID string, reversed bool, outFile string) error {
 	return nil
 }
 
-// GetPGN extracts the PGN from a lichess game url
+// GetGame extracts the PGN from a lichess game url
 func GetGame(pathOrID string) (*chess.Game, string, error) {
 	id, err := gameID(pathOrID)
 	if err != nil {
@@ -52,12 +54,12 @@ func GetGame(pathOrID string) (*chess.Game, string, error) {
 // gameID extracts the id of a lichess game from either analyze url, game url, or id
 func gameID(pathOrID string) (string, error) {
 
-	matchId, err := regexp.MatchString(`^[a-zA-Z0-9]{8,}$`, pathOrID)
+	matchID, err := regexp.MatchString(`^[a-zA-Z0-9]{8,}$`, pathOrID)
 	if err != nil {
 		return "", err
 	}
 
-	if matchId {
+	if matchID {
 		return pathOrID[0:8], nil
 	}
 

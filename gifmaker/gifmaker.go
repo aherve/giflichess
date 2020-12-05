@@ -2,8 +2,6 @@ package gifmaker
 
 import (
 	"fmt"
-	"github.com/aherve/chessimg"
-	"github.com/notnil/chess"
 	"image"
 	"image/color/palette"
 	"image/draw"
@@ -14,6 +12,9 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+
+	"github.com/aherve/chessimg"
+	"github.com/notnil/chess"
 )
 
 type imgOutput struct {
@@ -89,7 +90,7 @@ func GenerateGIF(game *chess.Game, gameID string, reversed bool, out io.Writer) 
 	images := make([]*image.Paletted, len(game.Positions()), len(game.Positions()))
 	imgChan := make(chan imgOutput)
 	quit := make(chan bool)
-	for i, _ := range game.Positions() {
+	for i := range game.Positions() {
 		wg.Add(1)
 		go func(gameID string, i int, outChan chan imgOutput) {
 			defer wg.Done()
@@ -152,10 +153,6 @@ func encodeGIFImage(gameID string, i int) (*image.Paletted, error) {
 	draw.Draw(palettedImage, palettedImage.Rect, inPNG, bounds.Min, draw.Over)
 
 	return palettedImage, nil
-}
-
-func annotatePNG(filebase string, whiteName string, blackName string, wg *sync.WaitGroup) {
-
 }
 
 func drawPNG(pos *chess.Position, whiteName string, blackName string, reversed bool, filebase string, wg *sync.WaitGroup) error {

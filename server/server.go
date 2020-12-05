@@ -3,14 +3,15 @@ package server
 import (
 	"errors"
 	"fmt"
-	"github.com/aherve/giflichess/gifmaker"
-	"github.com/aherve/giflichess/lichess"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/aherve/giflichess/gifmaker"
+	"github.com/aherve/giflichess/lichess"
 )
 
 // Serve starts a server

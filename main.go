@@ -2,16 +2,19 @@ package main
 
 import (
 	"fmt"
+	"log"
+	"os"
+
 	"github.com/aherve/giflichess/lichess"
 	"github.com/aherve/giflichess/server"
 	"github.com/urfave/cli"
-	"log"
-	"os"
 )
 
+// Version describes the app version
+const Version = "1.1.2"
+
 func main() {
-	var output string
-	var input string
+	var output, input string
 	var port int
 	var reversed bool
 	app := cli.NewApp()
@@ -74,5 +77,3 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
-const Version = "1.1.2"

@@ -1,9 +1,11 @@
 package gifmaker
 
 import (
-	"github.com/notnil/chess"
 	"os"
 	"testing"
+
+	"github.com/notnil/chess"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestWhiteName(t *testing.T) {
@@ -17,11 +19,7 @@ func TestWhiteName(t *testing.T) {
 	}
 
 	game := chess.NewGame(readPGN)
+	assert.Equal(t, "aherve (1527)", whiteName(game))
+	assert.Equal(t, "minahabibzadeeh (1558)", blackName(game))
 
-	if white := whiteName(game); white != "aherve (1527)" {
-		t.Error("expected white to == aherve (1527), got ", white)
-	}
-	if black := blackName(game); black != "minahabibzadeeh (1558)" {
-		t.Error("expected black to == minahabibzadeeh (1558), got ", black)
-	}
 }

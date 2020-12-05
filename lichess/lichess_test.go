@@ -1,28 +1,25 @@
 package lichess
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
 
 func TestGetGameID(t *testing.T) {
-	gameURL := "https://lichess.org/bR4b8jnouzUP"
-	analyzeURL := "https://lichess.org/bR4b8jno/white"
-	longID := "bR4b8jnouzUP"
-	shortID := "bR4b8jno"
+	urls := []string{
+		"https://lichess.org/bR4b8jnouzUP",
+		"https://lichess.org/bR4b8jno/white",
+		"bR4b8jnouzUP",
+		"bR4b8jnox",
+	}
 
 	expectedID := "bR4b8jno"
 
-	if r, _ := gameID(gameURL); r != expectedID {
-		t.Error("expected", expectedID, ", got ", r)
+	for _, url := range urls {
+		res, err := gameID(url)
+		assert.Nil(t, err, "err should be nil")
+		assert.Equal(t, expectedID, res)
 	}
 
-	if r, _ := gameID(analyzeURL); r != expectedID {
-		t.Error("expected", expectedID, ", got ", r)
-	}
-
-	if r, _ := gameID(longID); r != expectedID {
-		t.Error("expected", expectedID, ", got ", r)
-	}
-
-	if r, _ := gameID(shortID); r != expectedID {
-		t.Error("expected", expectedID, ", got ", r)
-	}
 }
