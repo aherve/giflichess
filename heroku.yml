@@ -3,4 +3,4 @@ build:
     web: Dockerfile
 run:
   web:
-    command: serve --port $PORT
+    command: ./giflichess serve --port $PORT
