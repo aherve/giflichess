@@ -2,5 +2,4 @@ build:
   docker:
     web: Dockerfile
 run:
-  web:
-    command: ./giflichess serve --port $PORT
+  web: ./giflichess serve --port $PORT
