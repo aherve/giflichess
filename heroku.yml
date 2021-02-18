@@ -1,5 +1,5 @@
 build:
   docker:
-    web: Dockerfile
+    web: Dockerfile.heroku
 run:
   web: ./giflichess serve --port $PORT
