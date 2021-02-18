@@ -13,7 +13,7 @@ import (
 )
 
 // GenerateFile generates a file from an url or gameID, into `outFile`. `reversed` can be set to true to view the game from black's perspective
-func GenerateFile(urlOrID string, reversed bool, outFile string) error {
+func GenerateFile(urlOrID string, reversed bool, outFile string, maxConcurrency int) error {
 	fmt.Printf("generating file %s from game %s...\n", outFile, urlOrID)
 	game, gameID, err := GetGame(urlOrID)
 	if err != nil {
@@ -25,7 +25,7 @@ func GenerateFile(urlOrID string, reversed bool, outFile string) error {
 	}
 	defer f.Close()
 
-	gifmaker.GenerateGIF(game, gameID, reversed, f)
+	gifmaker.GenerateGIF(game, gameID, reversed, f, maxConcurrency)
 	fmt.Printf("gif successfully outputed to %s\n", outFile)
 	return nil
 }

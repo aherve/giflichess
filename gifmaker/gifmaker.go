@@ -11,9 +11,9 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"sync"
 
 	"github.com/aherve/chessimg"
+	"github.com/aherve/gopool"
 	"github.com/notnil/chess"
 )
 
@@ -67,16 +67,16 @@ func blackName(game *chess.Game) string {
 
 // GenerateGIF will use *chess.Game to write a gif into an io.Writer
 // This uses inkscape & imagemagick as a dependency
-func GenerateGIF(game *chess.Game, gameID string, reversed bool, out io.Writer) error {
+func GenerateGIF(game *chess.Game, gameID string, reversed bool, out io.Writer, maxConcurrency int) error {
 
 	// Generate PNGs
-	var wg sync.WaitGroup
+	pool := gopool.NewPool(maxConcurrency)
 	for i, pos := range game.Positions() {
-		wg.Add(1)
-		go drawPNG(pos, whiteName(game), blackName(game), reversed, fileBaseFor(gameID, i), &wg)
+		pool.Add(1)
+		go drawPNG(pos, whiteName(game), blackName(game), reversed, fileBaseFor(gameID, i), pool)
 		defer cleanup(gameID, i)
 	}
-	wg.Wait()
+	pool.Wait()
 
 	// add Result to last png image
 	fileName := fileBaseFor(gameID, len(game.Positions())-1) + ".png"
@@ -90,17 +90,19 @@ func GenerateGIF(game *chess.Game, gameID string, reversed bool, out io.Writer) 
 	images := make([]*image.Paletted, len(game.Positions()), len(game.Positions()))
 	imgChan := make(chan imgOutput)
 	quit := make(chan bool)
-	for i := range game.Positions() {
-		wg.Add(1)
-		go func(gameID string, i int, outChan chan imgOutput) {
-			defer wg.Done()
-			encoded, err := encodeGIFImage(gameID, i)
-			outChan <- imgOutput{i, encoded, err}
-		}(gameID, i, imgChan)
 
-	}
 	go func() {
-		wg.Wait()
+		for i := range game.Positions() {
+			pool.Add(1)
+			go func(gameID string, i int, outChan chan imgOutput, pool *gopool.GoPool) {
+				defer pool.Done()
+				encoded, err := encodeGIFImage(gameID, i)
+				outChan <- imgOutput{i, encoded, err}
+				return
+			}(gameID, i, imgChan, pool)
+
+		}
+		pool.Wait()
 		quit <- true
 	}()
 
@@ -155,8 +157,8 @@ func encodeGIFImage(gameID string, i int) (*image.Paletted, error) {
 	return palettedImage, nil
 }
 
-func drawPNG(pos *chess.Position, whiteName string, blackName string, reversed bool, filebase string, wg *sync.WaitGroup) error {
-	defer wg.Done()
+func drawPNG(pos *chess.Position, whiteName string, blackName string, reversed bool, filebase string, pool *gopool.GoPool) error {
+	defer pool.Done()
 
 	// create file
 	f, err := os.Create(filebase + ".svg")

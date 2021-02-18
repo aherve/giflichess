@@ -12,11 +12,13 @@ import (
 
 // Version describes the app version
 const Version = "1.1.2"
+const defaultMaxConcurrency = 10
 
 func main() {
 	var output, input string
 	var port int
 	var reversed bool
+	var maxConcurrency int
 	app := cli.NewApp()
 	app.Name = "giflichess"
 	app.Usage = "generate fancy gifs from your lichess games"
@@ -31,7 +33,7 @@ func main() {
 				if len(input) == 0 {
 					return fmt.Errorf("Please pass an input game: example --game https://lichess.org/bR4b8jno")
 				}
-				return lichess.GenerateFile(input, reversed, output)
+				return lichess.GenerateFile(input, reversed, output, maxConcurrency)
 			},
 			Flags: []cli.Flag{
 				cli.StringFlag{
@@ -51,6 +53,12 @@ func main() {
 					Usage:       "Flip board",
 					Destination: &reversed,
 				},
+				cli.IntFlag{
+					Name:        "concurrency, c",
+					Usage:       "set max concurrency usage (lower concurrency to lower memory footprint)",
+					Destination: &maxConcurrency,
+					Value:       defaultMaxConcurrency,
+				},
 			},
 		},
 		{
@@ -58,7 +66,7 @@ func main() {
 			Aliases: []string{"s"},
 			Usage:   "run as a server",
 			Action: func(c *cli.Context) error {
-				server.Serve(port)
+				server.Serve(port, maxConcurrency)
 				return nil
 			},
 			Flags: []cli.Flag{
@@ -67,6 +75,12 @@ func main() {
 					Value:       8080,
 					Usage:       "server port",
 					Destination: &port,
+				},
+				cli.IntFlag{
+					Name:        "concurrency, c",
+					Value:       defaultMaxConcurrency,
+					Usage:       "set max concurrency usage (lower concurrency to lower memory footprint)",
+					Destination: &maxConcurrency,
 				},
 			},
 		},
