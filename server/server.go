@@ -18,7 +18,7 @@ import (
 func Serve(port, maxConcurrency int) {
 	http.HandleFunc("/api/ping", pingHandler)
 	http.HandleFunc("/api/lichess/", lichessGifHandler(maxConcurrency))
-	log.Printf("starting %s server on port %v\n", env(), port)
+	log.Printf("starting %s server on port %v with concurrency=%v\n", env(), port, maxConcurrency)
 	http.ListenAndServe(":"+strconv.Itoa(port), nil)
 }
 
