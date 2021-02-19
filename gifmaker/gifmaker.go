@@ -180,7 +180,7 @@ func drawPNG(pos *chess.Position, whiteName string, blackName string, reversed b
 	f.Close()
 
 	// Use inkscape to convert svg -> png
-	cmd := exec.Command("inkscape", "-z", "-e", filebase+".png", filebase+".svg")
+	cmd := exec.Command("dbus-run-session", "inkscape", "-z", "-e", filebase+".png", filebase+".svg")
 	cmd.Stderr = os.Stderr
 	if r := cmd.Run(); r != nil {
 		return err
