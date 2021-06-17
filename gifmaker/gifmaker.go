@@ -26,7 +26,7 @@ type imgOutput struct {
 
 // Declare colors for style
 var darkColor = color.RGBA{181, 136, 99, 255}
-var lightColor = color.RGBA{220, 217, 181, 255}
+var lightColor = color.RGBA{240, 217, 181, 255}
 
 func whiteName(game *chess.Game) string {
 	var elo, name string
