@@ -3,6 +3,7 @@ package gifmaker
 import (
 	"fmt"
 	"image"
+	"image/color"
 	"image/color/palette"
 	"image/draw"
 	"image/gif"
@@ -22,6 +23,10 @@ type imgOutput struct {
 	img   *image.Paletted
 	err   error
 }
+
+// Declare colors for style
+var darkColor = color.RGBA{181, 136, 99, 255}
+var lightColor = color.RGBA{220, 217, 181, 255}
 
 func whiteName(game *chess.Game) string {
 	var elo, name string
@@ -151,7 +156,8 @@ func encodeGIFImage(gameID string, i int) (*image.Paletted, error) {
 	}
 
 	bounds := inPNG.Bounds()
-	palettedImage := image.NewPaletted(bounds, palette.Plan9)
+	myPalette := append(palette.WebSafe, []color.Color{lightColor, darkColor}...)
+	palettedImage := image.NewPaletted(bounds, myPalette)
 	draw.Draw(palettedImage, palettedImage.Rect, inPNG, bounds.Min, draw.Over)
 
 	return palettedImage, nil
@@ -166,11 +172,13 @@ func drawPNG(pos *chess.Position, whiteName string, blackName string, reversed b
 		return err
 	}
 
+	colors := chessimg.SquareColors(lightColor, darkColor)
+
 	// write board SVG to file
 	if reversed {
-		err = chessimg.ReversedSVG(f, pos.Board())
+		err = chessimg.ReversedSVG(f, pos.Board(), colors)
 	} else {
-		err = chessimg.SVG(f, pos.Board())
+		err = chessimg.SVG(f, pos.Board(), colors)
 	}
 	if err != nil {
 		return err
