@@ -7,7 +7,7 @@ Golang application that converts any lichess game to an animated gif.
 
 ![example gif](assets/example.gif)
 
-- ~~[Live app](https://gifchess.com)~~ (deprecated for cost reasons)
+- [Live app](https://gifchess.com)
 - [Frontend repo](https://github.com/aherve/gifchess-front)
 
 ## Table Of Contents
